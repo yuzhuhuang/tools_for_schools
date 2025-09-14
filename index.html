@@ -28,6 +28,9 @@
   const link = document.getElementById('bm-link');
   const code = document.getElementById('bm-code').textContent.trim();
 
+  // This is the name we want to appear in the bookmarks bar
+  const bookmarkName = 'ICS Filter';
+
   // Put the code in href so "Right-click → Bookmark link" works
   link.href = code;
 
@@ -40,10 +43,18 @@
   // Make drag-to-bookmarks work across browsers
   link.setAttribute('draggable', 'true');
   link.addEventListener('dragstart', e => {
+    // Standard bookmarklet code payload
     e.dataTransfer.setData('text/uri-list', code);
     e.dataTransfer.setData('text/plain', code);
+    // Also hint the bookmark name to browsers that support DownloadURL
+    // Format: <mime>:<filename>:<url>
+    e.dataTransfer.setData('DownloadURL', `text/html:${bookmarkName}:${code}`);
   });
+
+  // Also change the visible text of the link to match
+  link.textContent = bookmarkName;
 </script>
+
 
 </body>
 </html>
