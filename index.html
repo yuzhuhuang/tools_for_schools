@@ -5,63 +5,45 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ICS Date-Range Filter Bookmarklet</title>
 <style>
-  body {
-    font-family: system-ui, sans-serif;
-    line-height: 1.5;
-    max-width: 650px;
-    margin: 2rem auto;
-    padding: 0 1rem;
-  }
-  h1 { font-size: 1.6rem; }
-  pre {
-    background: #f5f5f5;
-    padding: .75rem;
-    border-radius: 6px;
-    overflow-x: auto;
-  }
-  a.bookmarklet {
-    display:inline-block;
-    background:#0070f3;
-    color:#fff;
-    padding:.6rem .8rem;
-    border-radius:8px;
-    text-decoration:none;
-    font-weight:bold;
-    margin:.5rem 0;
-  }
+  body{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;line-height:1.5;max-width:650px;margin:2rem auto;padding:0 1rem}
+  h1{font-size:1.6rem;margin-bottom:.5rem}
+  .btn{display:inline-block;background:#0070f3;color:#fff;padding:.6rem .9rem;border-radius:8px;text-decoration:none;font-weight:700}
+  .note{color:#555;margin-top:.75rem;font-size:.95rem}
+  .muted{color:#6b7280;font-size:.9rem}
 </style>
 </head>
 <body>
 
-<h1>ICS Date-Range Filter Bookmarklet</h1>
+<h1>ICS Date-Range Filter</h1>
+<p class="muted">Drag the blue button to your bookmarks bar (or right-click → “Bookmark link”). Clicking it on this page won’t run the tool.</p>
 
-<p>This bookmarklet lets you filter an <code>.ics</code> calendar file by date directly in your browser.</p>
+<p><a id="bm-link" class="btn" href="#">ICS Date-Range Filter</a></p>
+<p class="note">Works on regular webpages (not <code>chrome://</code> or the new-tab page).</p>
 
-<h2>How to Install</h2>
-<ol>
-  <li><strong>Drag the blue button below</strong> to your bookmarks bar, or right-click → “Bookmark link”.</li>
-  <li>On any normal webpage, click the bookmarklet to run it.</li>
-</ol>
+<!-- Store the bookmarklet code safely without escaping -->
+<textarea id="bm-code" style="display:none">javascript:(()=>{try{if(document.getElementById('icsFilterHost'))return;const host=document.createElement('div');host.id='icsFilterHost';host.style.all='initial';host.style.position='fixed';host.style.top='20px';host.style.right='20px';host.style.zIndex='2147483647';document.body.appendChild(host);const shadow=host.attachShadow({mode:'open'});const css=`:host{all:initial}*,*::before,*::after{box-sizing:border-box}.card{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#0f172a;background:#ffffff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 8px 24px rgba(2,6,23,.15);padding:16px;min-width:320px;max-width:380px;overflow:hidden;position:relative}.title{margin:0 0 12px;font-size:16px;font-weight:600;letter-spacing:.2px;color:#0f172a}.row{display:flex;gap:10px}label{display:block;font-size:12px;color:#334155;margin:6px 0 6px 2px}input[type=date]{appearance:none;-webkit-appearance:none;width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;color:#0f172a;font-size:14px;outline:none;transition:border .15s,box-shadow .15s}input[type=date]:focus{border-color:#93c5fd;box-shadow:0 0 0 3px rgba(59,130,246,.25)}.btns{display:flex;justify-content:center;margin-top:14px}.btns button{flex:0 0 auto;min-width:200px}.primary{appearance:none;-webkit-appearance:none;border:1px solid #cbd5e1;border-radius:12px;background:#eaf2ff;border-color:#9db7ff;color:#0f172a;font-size:14px;font-weight:600;padding:10px 12px;cursor:pointer;transition:transform .02s ease,border .15s,box-shadow .15s}.primary:hover{border-color:#7aa2ff}.primary:active{transform:translateY(1px)}.sub{font-size:11px;color:#64748b;margin-top:8px}.x{position:absolute;top:8px;right:8px;border:none;background:transparent;font-size:16px;line-height:1;padding:6px;border-radius:8px;color:#64748b;cursor:pointer}.x:hover{background:#f1f5f9}`;const style=document.createElement('style');style.textContent=css;const wrap=document.createElement('div');wrap.className='card';wrap.innerHTML=`<button class="x" id="x" title="Close">✕</button><h3 class="title">ICS Date-Range Filter</h3><div class="row"><div style="flex:1"><label>Start date</label><input id="s" type="date" placeholder="YYYY-MM-DD" /></div><div style="flex:1"><label>End date</label><input id="e" type="date" placeholder="YYYY-MM-DD" /></div></div><div class="btns"><button id="go" class="primary">Choose ICS &amp; Filter</button></div><div class="sub">Your file stays in the browser; nothing is uploaded.</div>`;shadow.append(style,wrap);const $=id=>shadow.getElementById(id);const destroy=()=>{host.remove()};$('x').onclick=destroy;const s=$('s'),e=$('e');s.addEventListener('change',()=>{if(s.value){e.min=s.value;if(e.value&&e.value<s.value)e.value=''}});function unfoldICS(t){return t.replace(/(?:\r\n|\n)[ \t]/g,'')}function valueAfterColon(line){const i=line.indexOf(':');return i>=0?line.slice(i+1).trim():line.trim()}function parseIcsDate(line){const val=valueAfterColon(line);if(/^\d{8}$/.test(val))return new Date(+val.slice(0,4),+val.slice(4,6)-1,+val.slice(6,8));const m=val.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})(Z)?$/);if(m){const Y=+m[1],Mo=+m[2]-1,D=+m[3],H=+m[4],Mi=+m[5],S=+m[6];return m[7]?new Date(Date.UTC(Y,Mo,D,H,Mi,S)):new Date(Y,Mo,D,H,Mi,S)}return new Date(val)}function toYMD(d){const y=d.getFullYear(),m=('0'+(d.getMonth()+1)).slice(-2),dd=('0'+d.getDate()).slice(-2);return`${y}-${m}-${dd}`}function filterByDtstartInclusive(icsText,startYMD,endYMD){const txt=unfoldICS(icsText),parts=txt.split(/BEGIN:VEVENT/);if(parts.length===1)return{rebuilt:icsText,kept:0,dropped:0};const head=parts[0],kept=[];let keptCt=0,dropCt=0;for(let i=1;i<parts.length;i++){const chunk='BEGIN:VEVENT'+parts[i],j=chunk.indexOf('END:VEVENT');if(j<0)continue;const ev=chunk.slice(0,j+'END:VEVENT'.length),m=ev.match(/^DTSTART[^\r\n]*$/m);if(!m){dropCt++;continue}const dt=parseIcsDate(m[0]);if(isNaN(dt)){dropCt++;continue}const ymd=toYMD(dt);if(ymd>=startYMD&&ymd<=endYMD){kept.push(ev);keptCt++}else dropCt++}const last=txt.lastIndexOf('END:VEVENT'),tail=last>=0?txt.slice(last+'END:VEVENT'.length):'';const rebuilt=(/BEGIN:VCALENDAR/.test(head)?head:'BEGIN:VCALENDAR\r\n'+head)+kept.join('\r\n')+'\r\n'+(/END:VCALENDAR/.test(txt)?tail:'END:VCALENDAR\r\n');return{rebuilt,kept:keptCt,dropped:dropCt}};document.addEventListener('click',e=>{e.stopPropagation()});document.addEventListener('keydown',e=>{e.stopPropagation()});document.addEventListener('mousedown',e=>{e.stopPropagation()});document.addEventListener('touchstart',e=>{e.stopPropagation()});document.addEventListener('pointerdown',e=>{e.stopPropagation()});$('go').onclick=()=>{const start=s.value,end=e.value;if(!start||!end){alert('Please pick both Start and End dates.');return}const inp=document.createElement('input');inp.type='file';inp.accept='.ics,text/calendar';inp.onchange=async()=>{const file=inp.files&&inp.files[0];if(!file)return;const raw=await file.text();const {rebuilt,kept,dropped}=filterByDtstartInclusive(raw,start,end);const name=(file.name||'calendar').replace(/\.ics$/i,'')+`_filtered_${start}_to_${end}.ics`;const blob=new Blob([rebuilt],{type:'text/calendar;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;a.click();URL.revokeObjectURL(url);alert(`Filtered ${file.name}\nKept ${kept} event(s); dropped ${dropped}.`);destroy()};inp.click()};}catch(e){console.error(e)}})();</textarea>
 
-<p>
-  <a class="bookmarklet" href="javascript:(()=>{try{if(document.getElementById('icsFilterHost'))return;const host=document.createElement('div');host.id='icsFilterHost';host.style.all='initial';host.style.position='fixed';host.style.top='20px';host.style.right='20px';host.style.zIndex='2147483647';document.body.appendChild(host);const shadow=host.attachShadow({mode:'open'});const css=`:host{all:initial}*,*::before,*::after{box-sizing:border-box}.card{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#0f172a;background:#ffffff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 8px 24px rgba(2,6,23,.15);padding:16px;min-width:320px;max-width:380px;overflow:hidden;position:relative}.title{margin:0 0 12px;font-size:16px;font-weight:600;letter-spacing:.2px;color:#0f172a}.row{display:flex;gap:10px}label{display:block;font-size:12px;color:#334155;margin:6px 0 6px 2px}input[type=date]{appearance:none;-webkit-appearance:none;width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;color:#0f172a;font-size:14px;outline:none;transition:border .15s,box-shadow .15s}input[type=date]:focus{border-color:#93c5fd;box-shadow:0 0 0 3px rgba(59,130,246,.25)}.btns{display:flex;justify-content:center;margin-top:14px}.btns button{flex:0 0 auto;min-width:200px}.primary{appearance:none;-webkit-appearance:none;border:1px solid #cbd5e1;border-radius:12px;background:#eaf2ff;border-color:#9db7ff;color:#0f172a;font-size:14px;font-weight:600;padding:10px 12px;cursor:pointer;transition:transform .02s ease,border .15s,box-shadow .15s}.primary:hover{border-color:#7aa2ff}.primary:active{transform:translateY(1px)}.sub{font-size:11px;color:#64748b;margin-top:8px}.x{position:absolute;top:8px;right:8px;border:none;background:transparent;font-size:16px;line-height:1;padding:6px;border-radius:8px;color:#64748b;cursor:pointer}.x:hover{background:#f1f5f9}%60;const style=document.createElement('style');style.textContent=css;const wrap=document.createElement('div');wrap.className='card';wrap.innerHTML=%60<button class="x" id="x" title="Close">✕</button><h3 class="title">ICS Date-Range Filter</h3><div class="row"><div style="flex:1"><label>Start date</label><input id="s" type="date" placeholder="YYYY-MM-DD" /></div><div style="flex:1"><label>End date</label><input id="e" type="date" placeholder="YYYY-MM-DD" /></div></div><div class="btns"><button id="go" class="primary">Choose ICS &amp; Filter</button></div><div class="sub">Your file stays in the browser; nothing is uploaded.</div>%60;shadow.append(style,wrap);const $=id=>shadow.getElementById(id);const destroy=()=>{host.remove()};$('x').onclick=destroy;const s=$('s'),e=$('e');s.addEventListener('change',()=>{if(s.value){e.min=s.value;if(e.value&&e.value<s.value)e.value=''}});function unfoldICS(t){return t.replace(/(?:\r\n|\n)[ \t]/g,'')}function valueAfterColon(line){const i=line.indexOf(':');return i>=0?line.slice(i+1).trim():line.trim()}function parseIcsDate(line){const val=valueAfterColon(line);if(/^\d{8}$/.test(val))return new Date(+val.slice(0,4),+val.slice(4,6)-1,+val.slice(6,8));const m=val.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})(Z)?$/);if(m){const Y=+m[1],Mo=+m[2]-1,D=+m[3],H=+m[4],Mi=+m[5],S=+m[6];return m[7]?new Date(Date.UTC(Y,Mo,D,H,Mi,S)):new Date(Y,Mo,D,H,Mi,S)}return new Date(val)}function toYMD(d){const y=d.getFullYear(),m=('0'+(d.getMonth()+1)).slice(-2),dd=('0'+d.getDate()).slice(-2);return%60${y}-${m}-${dd}%60}function filterByDtstartInclusive(icsText,startYMD,endYMD){const txt=unfoldICS(icsText),parts=txt.split(/BEGIN:VEVENT/);if(parts.length===1)return{rebuilt:icsText,kept:0,dropped:0};const head=parts[0],kept=[];let keptCt=0,dropCt=0;for(let i=1;i<parts.length;i++){const chunk='BEGIN:VEVENT'+parts[i],j=chunk.indexOf('END:VEVENT');if(j<0)continue;const ev=chunk.slice(0,j+'END:VEVENT'.length),m=ev.match(/^DTSTART[^\r\n]*$/m);if(!m){dropCt++;continue}const dt=parseIcsDate(m[0]);if(isNaN(dt)){dropCt++;continue}const ymd=toYMD(dt);if(ymd>=startYMD&&ymd<=endYMD){kept.push(ev);keptCt++}else dropCt++}const last=txt.lastIndexOf('END:VEVENT'),tail=last>=0?txt.slice(last+'END:VEVENT'.length):'';const rebuilt=(/BEGIN:VCALENDAR/.test(head)?head:'BEGIN:VCALENDAR\r\n'+head)+kept.join('\r\n')+'\r\n'+(/END:VCALENDAR/.test(txt)?tail:'END:VCALENDAR\r\n');return{rebuilt,kept:keptCt,dropped:dropCt}}$('go').onclick=()=>{const start=s.value,end=e.value;if(!start||!end){alert('Please pick both Start and End dates.');return}const inp=document.createElement('input');inp.type='file';inp.accept='.ics,text/calendar';inp.onchange=async()=>{const file=inp.files&&inp.files[0];if(!file)return;const raw=await file.text();const {rebuilt,kept,dropped}=filterByDtstartInclusive(raw,start,end);const name=(file.name||'calendar').replace(/\.ics$/i,'')+%60_filtered_${start}_to_${end}.ics%60;const blob=new Blob([rebuilt],{type:'text/calendar;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;a.click();URL.revokeObjectURL(url);alert(%60Filtered ${file.name}\nKept ${kept} event(s); dropped ${dropped}.%60);destroy()};inp.click()};}catch(e){console.error(e)}})();">
-    ICS Date-Range Filter
-  </a>
-</p>
+<script>
+  // Build a drag-only (no-run-on-click) bookmarklet link
+  const link = document.getElementById('bm-link');
+  const code = document.getElementById('bm-code').textContent.trim();
 
-<h2>How to Use</h2>
-<ol>
-  <li>Click the “ICS Date-Range Filter” bookmarklet in your bookmarks bar.</li>
-  <li>Pick your Start and End dates.</li>
-  <li>Click “Choose ICS &amp; Filter” and select your <code>.ics</code> file.</li>
-  <li>It downloads a filtered file to your Downloads folder.</li>
-</ol>
+  // Put the code in href so "Right-click → Bookmark link" works
+  link.href = code;
 
-<h2>Notes</h2>
-<ul>
-  <li>The file never leaves your browser.</li>
-  <li>It works on any normal webpage but not on <code>chrome://</code> or the new-tab page.</li>
-</ul>
+  // But prevent clicks on the page from running it
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    alert('Drag this button to your bookmarks bar (or right-click → “Bookmark link”).');
+  });
+
+  // Make drag-to-bookmarks work across browsers
+  link.setAttribute('draggable', 'true');
+  link.addEventListener('dragstart', e => {
+    e.dataTransfer.setData('text/uri-list', code);
+    e.dataTransfer.setData('text/plain', code);
+  });
+</script>
 
 </body>
 </html>
