@@ -8,7 +8,7 @@
   body {
     font-family: system-ui, Segoe UI, Roboto, Arial, sans-serif;
     line-height: 1.5;
-    max-width: 650px;
+    max-width: 650px;       /* text column width */
     margin: 2rem auto;
     padding: 0 1rem;
   }
@@ -22,19 +22,22 @@
     text-decoration: underline;
     cursor: grab;
   }
-  a.bookmarklet:hover {
-    color: #0059c9;
+  a.bookmarklet:hover { color: #0059c9; }
+  .note { color: #555; margin-top: .75rem; font-size: .95rem; }
+  .muted { color: #6b7280; font-size: .9rem; }
+
+  /* Demo video styling — narrower than text column */
+  .demo { max-width: 520px; margin: 1rem auto 0; text-align: center; }
+  .demo video {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.08);
+    display: block;
   }
-  .note {
-    color: #555;
-    margin-top: .75rem;
-    font-size: .95rem;
-  }
-  .muted {
-    color: #6b7280;
-    font-size: .9rem;
-  }
+  .caption { color: #6b7280; font-size: .9rem; margin-top: .35rem; }
 </style>
+  
 </head>
 <body>
 
